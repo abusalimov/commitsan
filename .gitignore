@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+
+venv/
+build/
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+.coverage
+.coverage.*

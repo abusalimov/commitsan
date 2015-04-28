@@ -26,7 +26,7 @@ def output(*args, **kwargs):
     print(*args, **kwargs)
 
 @job(q)
-def post_status(repo, commit, context, description, state='failure', **kwargs):
+def post_status(repo, commit, context, description, state='pending', **kwargs):
     endpoint = github.repos(repo).statuses(commit)
     if 'target_url' not in kwargs:
         kwargs['target_url'] = (GITHUB_BLOB_URL_TMPL
@@ -38,5 +38,6 @@ def post_status(repo, commit, context, description, state='failure', **kwargs):
     endpoint.post(context='commitsan/{}'.format(context),
                   description=description, state=state, **kwargs)
 
-def report_issue(repo, commit, context, description):
-    post_status.delay(repo, commit, context, description)
+def report_issue(repo, commit, context, description, fatal=False):
+    post_status.delay(repo, commit, context, description,
+                      state='failure' if fatal else 'pending')

@@ -52,7 +52,7 @@ def check_diff(repo, commit):
         description = ('{} line{plural} introduce{singular} whitespace errors'
                       .format(bad_lines,
                               plural='s'*(not single), singular='s'*single))
-        report_issue(repo, commit, 'diff', description)
+        report_issue(repo, commit, 'diff', description, fatal=True)
 
 
 def check_all(repo, commit):

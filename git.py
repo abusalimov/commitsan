@@ -46,3 +46,12 @@ def git_show(repo, commit, format='%B'):
     out = git_cmd(repo, ['show', '--no-patch', format_arg, commit])
     return out
 
+def git_diff_check(repo, commit):
+    try:
+        git_cmd(repo, ['diff-tree', '--check', '--no-color', commit])
+    except CalledProcessError as e:
+        out = e.output
+        return sum(line[0] == '+' for line in out.splitlines() if line) or 1
+    else:
+        return 0
+

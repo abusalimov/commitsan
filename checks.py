@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 
-from git import git_show
+from git import git_show, git_diff_check
 from report import report_issue
 
 
@@ -45,5 +45,16 @@ def check_msg(repo, commit):
     msg_subj(repo, commit, lines)
     msg_wrap(repo, commit, lines)
 
+def check_diff(repo, commit):
+    bad_lines = git_diff_check(repo, commit)
+    if bad_lines:
+        single = (bad_lines == 1)
+        description = ('{} line{plural} introduce{singular} whitespace errors'
+                      .format(bad_lines,
+                              plural='s'*(not single), singular='s'*single))
+        report_issue(repo, commit, 'diff', description)
+
+
 def check_all(repo, commit):
     check_msg(repo, commit)
+    check_diff(repo, commit)

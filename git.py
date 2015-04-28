@@ -34,8 +34,12 @@ def git_cmd(repo, args, no_git_dir=False):
     return run_cmd(['git'] + args, env=env, cwd=repo_path)
 
 def git_revlist(repo, *commits):
-    out = git_cmd(repo, ['rev-list'] + list(commits) + ['--'])
-    return out.splitlines()
+    try:
+        out = git_cmd(repo, ['rev-list'] + list(commits) + ['--'])
+    except CalledProcessError:
+        return []
+    else:
+        return out.splitlines()
 
 def git_show(repo, commit, format='%B'):
     format_arg = '--format={}'.format(format)  # deal with it

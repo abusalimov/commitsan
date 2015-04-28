@@ -12,6 +12,7 @@ from rq import Queue
 from rq.decorators import job
 
 from worker import REDIS_CONN
+import report
 
 q = Queue(connection=REDIS_CONN)
 
@@ -80,4 +81,20 @@ def process_commit_range(repo, *commits):
 
 
 def process_commit(repo, commit):
-    pass
+    reports = []
+    add_report = reports.append
+
+    lines = [line.expandtabs() for line in git_show(repo, commit).splitlines()]
+
+    if not lines:
+        add_report(report.empty_message)
+    else:
+        if len(lines) > 1 and lines[1]:
+            add_report(report.non_empty_message_line_after_subject)
+        for line in lines:
+            if len(line) > 72 and not line.startswith(' '*4):
+                add_report(report.too_long_message_line)
+
+    for job_func in sorted(reports):
+        job_func.delay(repo, commit)
+

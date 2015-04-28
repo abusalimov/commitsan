@@ -49,6 +49,15 @@ def run_git(repo, args, no_git_dir=False):
         env['GIT_DIR'] = repo_path
     return run_cmd(['git'] + args, env=env, cwd=repo_path)
 
+def git_revlist(repo, *commits):
+    out = run_git(repo, ['rev-list'] + list(commits) + ['--'])
+    return out.splitlines()
+
+def git_show(repo, commit, format='%B'):
+    format_arg = '--format={}'.format(format)  # deal with it
+    out = run_git(repo, ['show', '--no-patch', format_arg, commit])
+    return out
+
 
 @job(q)
 def update_repo(repo, clone_url):

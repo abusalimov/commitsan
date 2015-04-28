@@ -74,6 +74,10 @@ def update_repo(repo, clone_url):
 
 
 @job(q)
-def process_commit_range(repo, before, after):
-    pass
+def process_commit_range(repo, *commits):
+    for commit in git_revlist(repo, *commits):
+        process_commit(repo, commit)
 
+
+def process_commit(repo, commit):
+    pass

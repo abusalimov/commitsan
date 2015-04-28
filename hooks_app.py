@@ -16,6 +16,8 @@ app = HookServer(__name__, bytes(github_webhook_secret, 'utf-8'))
 app.config['DEBUG'] = True
 
 
+NULL_SHA = '0'*40
+
 @app.hook('ping')
 def ping(data, guid):
     repo = data['repository']
@@ -28,8 +30,16 @@ def push(data, guid):
     repo = data['repository']
     update_job = git_jobs.update_repo.delay(repo['full_name'],
                                             repo['clone_url'])
-    git_jobs.process_commits.delay(repo['full_name'],
-                               data['before'], data['after'],
-                               depends_on=update_job)
+
+    from_commit = data['before']
+    to_commit = data['after']
+
+    if to_commit != NULL_SHA:  # skip branch deletions
+        if from_commit == NULL_SHA:
+            from_commit = 'master'
+        commit_range = '{}..{}'.format(from_commit, to_commit)
+
+        git_jobs.process_commit_range.delay(repo['full_name'], commit_range,
+                                         depends_on=update_job)
 
     return 'OK'

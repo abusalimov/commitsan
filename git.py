@@ -6,7 +6,7 @@ import errno
 import os
 import sys
 import subprocess
-from subprocess import STDOUT, CalledProcessError
+from subprocess import CalledProcessError
 
 REPOS_PATH = os.path.abspath('repos')
 
@@ -21,8 +21,8 @@ def mkdir_p(path):
 
 def run_cmd(args, bypass_exit_code=False, **kwargs):
     try:
-        return subprocess.check_output(args, stderr=STDOUT, **kwargs)
-    except CalledProcessError as e:
+        return subprocess.check_output(args, **kwargs)
+    except CalledProcessError:
         if not bypass_exit_code:
             raise
 

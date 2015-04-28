@@ -25,7 +25,8 @@ def output(*args, **kwargs):
     kwargs.setdefault('file', sys.stderr)
     print(*args, **kwargs)
 
-def post_status(repo, commit, context, state='failure', **kwargs):
+@job(q)
+def post_status(repo, commit, context, description, state='failure', **kwargs):
     endpoint = github.repos(repo).statuses(commit)
     if 'target_url' not in kwargs:
         kwargs['target_url'] = (GITHUB_BLOB_URL_TMPL
@@ -35,20 +36,7 @@ def post_status(repo, commit, context, state='failure', **kwargs):
            '{context} ({description})'
            .format(**dict(kwargs, **locals())))
     endpoint.post(context='commitsan/{}'.format(context),
-                  state=state, **kwargs)
+                  description=description, state=state, **kwargs)
 
-
-@job(q)
-def empty_message(repo, commit):
-    post_status(repo, commit, 'msg/empty',
-                description='Must provide log message')
-
-@job(q)
-def non_empty_message_line_after_subject(repo, commit):
-    post_status(repo, commit, 'msg/subj',
-                description='Separate subject from body with a blank line')
-
-@job(q)
-def too_long_message_line(repo, commit):
-    post_status(repo, commit, 'msg/wrap',
-                description='Wrap the body at 72 characters')
+def report_issue(repo, commit, context, description):
+    post_status.delay(repo, commit, context, description)

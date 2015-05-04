@@ -2,8 +2,8 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 
-from git import git_show, git_diff_check
-from report import report_issue
+from commitsan.git import git_show, git_diff_check
+from commitsan.report import report_issue
 
 
 def msg_non_empty(repo, commit, lines):

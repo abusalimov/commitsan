@@ -4,7 +4,7 @@ from builtins import *
 
 from flask import Flask
 
-from hooks_app import app as hooks
+from commitsan.hooks_app import app as hooks
 
 
 frontend = Flask(__name__)

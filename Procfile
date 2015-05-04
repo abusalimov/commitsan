@@ -1,1 +1,1 @@
-web: sh -c 'gunicorn web_app:app --log-file=- & python -u ./worker.py & wait'
+web: sh -c 'gunicorn commitsan.web_app:app --log-file=- & python -u -m commitsan.worker & wait'

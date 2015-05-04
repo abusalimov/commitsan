@@ -5,7 +5,7 @@ from builtins import *
 import os
 from hookserver import HookServer
 
-import repos
+from commitsan import repos
 
 
 github_webhook_secret = os.environ.get('GITHUB_WEBHOOK_SECRET')

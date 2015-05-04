@@ -8,9 +8,10 @@ import sys
 from rq import Queue
 from rq.decorators import job
 
-from git import REPOS_PATH, CalledProcessError, git_cmd, git_revlist, mkdir_p
-from worker import REDIS_CONN
-from checks import check_all
+from commitsan.git import (REPOS_PATH, CalledProcessError,
+                           git_cmd, git_revlist, mkdir_p)
+from commitsan.worker import REDIS_CONN
+from commitsan.checks import check_all
 
 q = Queue(connection=REDIS_CONN)
 

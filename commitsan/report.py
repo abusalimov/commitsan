@@ -7,7 +7,7 @@ from github import GitHub, ApiError
 from rq import Queue
 from rq.decorators import job
 
-from worker import REDIS_CONN
+from commitsan.worker import REDIS_CONN
 
 q = Queue(connection=REDIS_CONN)
 

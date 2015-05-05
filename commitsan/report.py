@@ -4,12 +4,8 @@ from builtins import *
 
 import os
 from github import GitHub, ApiError
-from rq import Queue
-from rq.decorators import job
 
-from commitsan.worker import REDIS_CONN
-
-q = Queue(connection=REDIS_CONN)
+from commitsan.worker import job
 
 
 github_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
@@ -25,7 +21,7 @@ def output(*args, **kwargs):
     kwargs.setdefault('file', sys.stderr)
     print(*args, **kwargs)
 
-@job(q)
+@job()
 def post_status(repo, commit, context, description, state='pending', **kwargs):
     endpoint = github.repos(repo).statuses(commit)
     if 'target_url' not in kwargs:

@@ -5,15 +5,11 @@ from builtins import *
 import os
 import shutil
 import sys
-from rq import Queue
-from rq.decorators import job
 
 from commitsan.git import (REPOS_PATH, CalledProcessError,
                            git_cmd, git_revlist, mkdir_p)
-from commitsan.worker import REDIS_CONN
+from commitsan.worker import job
 from commitsan.checks import check_all
-
-q = Queue(connection=REDIS_CONN)
 
 
 def output(*args, **kwargs):
@@ -21,7 +17,7 @@ def output(*args, **kwargs):
     print(*args, **kwargs)
 
 
-@job(q)
+@job()
 def update_repo(repo, clone_url):
     try:
         out = git_cmd(repo, ['remote', 'update'])
@@ -35,7 +31,7 @@ def update_repo(repo, clone_url):
     output(out)
 
 
-@job(q)
+@job()
 def process_commit_range(repo, *commits):
     for commit in git_revlist(repo, *commits):
         check_all(repo, commit)

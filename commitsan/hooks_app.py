@@ -6,6 +6,7 @@ import os
 from hookserver import HookServer
 
 from commitsan import repos
+from commitsan.github import github
 
 
 github_webhook_secret = os.environ.get('GITHUB_WEBHOOK_SECRET')
@@ -21,7 +22,13 @@ NULL_SHA = '0'*40
 @app.hook('ping')
 def ping(data, guid):
     repo = data['repository']
-    repos.update_repo.delay(repo['full_name'], repo['clone_url'])
+    update_job = repos.update_repo.delay(repo['full_name'], repo['clone_url'])
+
+    for branch in github.repos(repo['full_name']).branches.get():
+        if branch['name'] != 'master':
+            commit_range = '{}..{}'.format('master', branch['commit']['sha'])
+            repos.process_commit_range.delay(repo['full_name'], commit_range,
+                                             depends_on=update_job)
 
     return 'pong: {}'.format(data['zen'])
 
